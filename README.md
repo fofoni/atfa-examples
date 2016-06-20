@@ -2,15 +2,20 @@
 Adaptive filter algorithm examples and DSO build helper for ATFA
 ================================================================
 
-ATFA is the Ambiente de Testes para Filtros Adaptativos (Testing
+ATFA is the [Ambiente de Testes para Filtros Adaptativos][1] (Testing
 environment for adaptive filters).
 
 Quick How-To
 ------------
 
+The algorithms must be compiled and linked into a `*.so` file. This can
+be done manually, or by using the helper script `[build.py][2]`. 
+Aditionally, the script `build-all.sh` can also be used to compile all
+of the examples at once.
+
 If you just want to compile the examples to use from ATFA, type:
 
-    $ cd atfa-libs
+    $ cd atfa-examples
     $ chmod +x build-all.sh build.py
     $ ./build-all.sh
 
@@ -30,8 +35,7 @@ following symbols:
 * `adapf_listing`
 
 The last two (`adapf_title` and `adapf_listing`) are generated
-automatically but the `build.py` script (see the section on how to use
-it below).
+automatically by the `[build.py][2]` script.
 
 * `void *adapf_init()`: The `adapf_init` function initializes (e.g.,
   acquires memory for) the data structures that the algorithm will use.
@@ -43,3 +47,5 @@ it below).
   that has been learned so far), and returns a pointer to the zeroed
   data. This function might free the memory pointed to by the old data,
   and return a pointer newly allocated-and-initialized memory.
+
+[1]: https://github.com/fofoni/atfa
