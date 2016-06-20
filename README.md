@@ -35,7 +35,8 @@ following symbols:
 * `adapf_listing`
 
 The last two (`adapf_title` and `adapf_listing`) are generated
-automatically by the `[build.py][2]` script.
+automatically by the `[build.py][2]` script. Below, each of the
+functions to be exported is explained:
 
 * `void *adapf_init()`: The `adapf_init` function initializes (e.g.,
   acquires memory for) the data structures that the algorithm will use.
@@ -55,3 +56,5 @@ To compile an algorithm into a DSO file to be used with ATFA, use the
 `[build.py][3]` helper script.
 
 [1]: https://github.com/fofoni/atfa
+[2]: #how-to-compile-an-algorithm
+[3]: https://github.com/fofoni/atfa-examples/blob/master/build.py
