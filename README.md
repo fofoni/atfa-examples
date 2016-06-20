@@ -48,4 +48,10 @@ automatically by the `[build.py][2]` script.
   data. This function might free the memory pointed to by the old data,
   and return a pointer newly allocated-and-initialized memory.
 
+How to compile an algorithm
+---------------------------
+
+To compile an algorithm into a DSO file to be used with ATFA, use the
+`[build.py][3]` helper script.
+
 [1]: https://github.com/fofoni/atfa
