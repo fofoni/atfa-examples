@@ -196,7 +196,7 @@ def cstr(s):
     )
 
 def safename_from_path(path):
-    return safe_name(os.path.splitext(os.path.split(path)[1])[0])
+    return safe_name(os.path.splitext(os.path.split(path)[-1])[0])
 
 if __name__ == '__main__':
 
