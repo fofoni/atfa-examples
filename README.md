@@ -5,6 +5,15 @@ Adaptive filter algorithm examples and DSO build helper for ATFA
 ATFA is the [Ambiente de Testes para Filtros Adaptativos][1] (Testing
 environment for adaptive filters).
 
+This repository
+
+* provides examples of adaptive filtering algorithms implemented in C++
+  and C, and exposing the API that ATFA expects;
+* explains how to understand the examples, how to modify them, how to
+  write your own algorithms, and how to compile them;
+* provides scripts to compile the algorithms into the file format that
+  ATFA expects, namely dynamic shared objects, or DSOs (`*.so`).
+
 
 Quick How-To
 ------------
