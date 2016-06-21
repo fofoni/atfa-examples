@@ -38,7 +38,9 @@ The last two (`adapf_title` and `adapf_listing`) are generated
 automatically by the [`build.py`][2] script. Below, each of the
 functions to be exported is explained:
 
-* `void *adapf_init()`: The `adapf_init` function initializes (e.g.,
+### `void *adapf_init()`
+
+The `adapf_init` function initializes (e.g.,
   acquires memory for) the data structures that the algorithm will
   use. This data structure must include the impulse response vector
   (vector of filter coefficients), the input vector, and any other information the algorithm wants to keep
@@ -79,6 +81,6 @@ You can also use [`build-all.sh`][5].
 [1]: https://github.com/fofoni/atfa
 [2]: #how-to-compile-an-algorithm
 [3]: https://github.com/fofoni/atfa-examples/blob/master/build.py
-[4]: #using-build-all-sh
+[4]: #using-build-allsh
 [5]: https://github.com/fofoni/atfa-examples/blob/master/build-all.sh
 [6]: http://portaudio.com/docs/v19-doxydocs/writing_a_callback.html
