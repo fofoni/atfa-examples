@@ -132,7 +132,7 @@ To compile an algorithm into a DSO file to be used with ATFA, you can do
 so manually—just generate an `*.so` that exports all of the functions
 mentioned above—, or you can use the [`build.py`][3] helper script.
 
-To use this script, open a shell inside a directory containing your
+To use this script, open a shell inside the directory containing your
 source file(s), and then run the script. For example, to compile the
 [`LMS/`][LMS] algorithm, type:
 
@@ -142,9 +142,48 @@ $ cd LMS
 $ python3 ../build.py
 ```
 
+By default, `build.py` will compile and link all of the `*.c` and
+`*.cpp` files in the current directory. To use a custom set of sources,
+just pass them as arguments:
+
+```bash
+$ python3 ../build.py source1.cpp source2.cpp
+```
+
+The full set of source files specified on the command-line (or present
+in the directory, if none is specified) must contain the definitions of
+all of the functions mentioned [above][7], except `atfa_title` and
+`atfa_listing`. These will be automatically generated.
+
+By default, the title is made up based on the command line, and the
+algorithm listing is just a transcription of the source files. If you
+want to use a custom title, use the `-t/--title` flag. If you want to
+specify a custom file containing the listing, use the `-l/--listing`
+flag:
+
+```bash
+$ python3 ../build.py --title "My Algorithm" --listing my_algorithm.txt
+```
+
+If you want to provide the `atfa_title` or `atfa_listing` functions
+yourself, use the `+t` or `+l` flags:
+
+```bash
+$ python3 ../build.py main_source.cpp title_and_listing.cpp +tl
+```
+
+For more options, type:
+
+```bash
+$ python3 ../build.py --help
+```
+
 ### Using `build-all.sh`
 
-You can also use [`build-all.sh`][5].
+You can also use the convenience script [`build-all.sh`][5]. This script
+will just call `python3 ../build.py` from inside each subdirectory of the
+current directory. It will also pass the name of the directory in the
+`--title` flag.
 
 [1]: https://github.com/fofoni/atfa
 [2]: #how-to-compile-an-algorithm
@@ -152,6 +191,7 @@ You can also use [`build-all.sh`][5].
 [4]: #using-build-allsh
 [5]: https://github.com/fofoni/atfa-examples/blob/master/build-all.sh
 [6]: http://portaudio.com/docs/v19-doxydocs/writing_a_callback.html
+[7]: #how-to-write-algorithms
 
 [adapf_init]:    #void-adapf_init
 [adapf_restart]: #void-adapf_restartvoid-data
