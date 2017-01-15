@@ -9,8 +9,8 @@
 
 extern "C" {
 
-constexpr unsigned N = 10;
-constexpr float mu = 1;
+constexpr unsigned N = 128;
+constexpr float mu = .5;
 
 struct LMS_data {
     float w[N];

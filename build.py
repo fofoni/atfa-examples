@@ -12,15 +12,19 @@ Orientador: Markus Lima
 
 """
 TODO:
-* fornecer nome do build-dir
-* fornecer CPPFLAGS
-* fornecer compile-only flags
-* fornecer link-only flags
+* fornecer nome do build-dir                       -b, --build-dir
+* fornecer CPPFLAGS                                -f, --cppflags
+* fornecer compile-only flags                      --compile-flags
+* fornecer link-only flags                         --link-flags
 * verificar se é C ou C++ e compilar de acordo
-* fornecer compilador customizado
-* não usar compile flags default
-* não usar link flags default
-* dry run
+* fornecer compilador customizado                  -c, --compiler-name
+* fornecer linker customizado                      -l, --linker-name
+* não usar compile flags default                   ++compile-flags
+* não usar link flags default                      ++link-flags
+* fazer TODO dentro do gen_obj ("quotar" parâmetros do bash). O mesmo
+  deve ser feito em todos os outros lugares que imprimimos linhas de
+  comando.
+* dry run                                          -n, --dry-run
 * caso haja mais de um source e o usuário não especificar um título,
   usar
   http://eli.thegreenplace.net/2011/07/03/parsing-c-in-python-with-clang
@@ -48,6 +52,22 @@ TODO:
 * aceitar defaults para a maioria das opções passados via environment
   (e.g. CC, CFLAGS, etc)
 * fornecer mais de uma code-file (usar action='append' no argparse)
+* testar se o stdout é terminal ou não, e se não for, não imprimir
+  cores. adicionar flag --color={never,auto,always}, igual ao grep
+  (default é auto, 'false' e 'no' são sinônimos de never, 'true' e 'yes'
+   são sinônimos de 'always'. Será que o add_argument() aceita uma lista
+   de choices que seja case-insensitive?)
+  (já testamos se é linux, né? Se não for linux, também não bota cor.
+   procurar no google por "how to test if output accepts ANSI color
+   codes" e "python colored output cross-platform")
+* opção para não deletar a tempfile (-k, --keep-temps). A princípio, não
+  muda o fato de que usaremos o NamedTemporaryFile para gerá-la -- só o
+  que muda é que a gente vai falar para não deletar depois.
+* opção para escolher o nome da tempfile. Isso significa que não
+  usaremos mais o NamedTemporaryFile -- vamos criar o arquivo na mão.
+  Mas isso não muda o fato de que o arquivo será deletado depois. (e
+  portanto, será deletado manualmente por esse script, já que foi criado
+  manualmente.)
 """
 
 import glob
