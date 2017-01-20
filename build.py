@@ -115,14 +115,19 @@ main_src_string = 'adapf_run'
 
 tw = textwrap.TextWrapper(subsequent_indent='      ')
 
-cc = "g++"
-cflags_std = ["-std=c++11", "-Wall", "-Werror", "-pedantic"]
-cflags_opt = ["-march=native", "-mtune=native", "-O3"]
-cflags = cflags_std + cflags_opt
-compile_flags = ["-fPIC"]
-link_flags = ["-shared"]
-compile_cmd = [cc] + cflags + compile_flags
-link_cmd = [cc] + link_flags + cflags
+cc            = {'C++': ["g++"],
+                 'C':   ["gcc"]}
+cflags_std    = {'C++': ["-std=c++11"],
+                 'C':   ["-std=c11"  ]}
+cflags_wng    =         ["-Wall", "-Werror", "-pedantic"]
+cflags_opt    =         ["-march=native", "-mtune=native", "-O3"]
+cflags        = {'C++': cflags_std['C++'] + cflags_wng + cflags_opt,
+                 'C'  : cflags_std['C']   + cflags_wng + cflags_opt}
+compile_flags =         ["-fPIC"]
+link_flags    =         ["-shared"]
+compile_cmd   = {'C++': cc['C++'] + cflags['C++'] + compile_flags,
+                 'C':   cc['C']   + cflags['C']   + compile_flags}
+link_cmd      =         cc['C++'] + link_flags + cflags_wng + cflags_opt
 
 def gen_obj(f, obj):
     comp = "Compiling:"
@@ -132,7 +137,13 @@ def gen_obj(f, obj):
     compmsg = compmsg.replace(os.path.split(obj)[-1],
                               bcolors.head(os.path.split(obj)[-1]), 1)
     print(compmsg)
-    comp_full = compile_cmd + ["-o", obj, "-c", f]
+    if f.endswith(".c"):
+        lang = 'C'
+    elif f.endswith(".cpp"):
+        lang = 'C++'
+    else:
+        die(13, "File " + f + " should be `.c' or `.cpp'.")
+    comp_full = compile_cmd[lang] + ["-o", obj, "-c", f]
     # TODO: caso algum dos parêmetros (elementos da lista 'comp_full')
     #       tenha caracteres estranhos, o check_call vai ficar de boa,
     #       mas o " ".join vai ficar confuso. Quotar os parâmetros
