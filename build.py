@@ -74,6 +74,7 @@ import glob
 import sys
 import os
 import os.path
+import pathlib
 import textwrap
 import unicodedata
 import subprocess
@@ -335,6 +336,19 @@ if __name__ == '__main__':
     sources = {s: '' for s in args.files}
     if len(sources) == 0:
         sources = {s: '' for s in list_all_sources(source_files)}
+
+
+    bad_sources = []
+    for k in sources:
+        if not pathlib.Path(k).is_file():
+            warn("Source '{}' is not a file: skipping.".format(k))
+            bad_sources.append(k)
+        elif os.stat(k).st_size == 0:
+            warn("Source '{}' is empty: skipping.".format(k))
+            bad_sources.append(k)
+    for k in bad_sources:
+        del sources[k]
+
     if len(sources) == 0:
         die(1, "Couldn't find source files (" + source_files_str + ").")
 
@@ -376,7 +390,7 @@ if __name__ == '__main__':
     if len(main_source) == 0:
         warn("Looks like none of the source files contains the"
              " definition of the '" + main_src_string + "' routine!")
-        main_source = sources
+        main_source = list(sources)
     elif len(main_source) > 1:
         warn("Looks like more than one of the source files define the"
              " '" + main_src_string + "' routine!")
