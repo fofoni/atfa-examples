@@ -9,7 +9,9 @@
 
 extern "C" {
 
-struct dummy {};
+struct dummy {
+    float placeholder;
+};
 
 void *adapf_init(void)
 {
@@ -27,9 +29,15 @@ int adapf_close(void *data)
     return 1; // success
 }
 
-float adapf_run(void *, float, float y)
+float adapf_run(void *, float, float y, int)
 {
     return y;
+}
+
+void adapf_getw(void *data, float **begin, unsigned *n)
+{
+    *begin = &static_cast<dummy *>(data)->placeholder;
+    *n = 0;
 }
 
 }

@@ -83,12 +83,13 @@ int adapf_close(void *data)
     return 1; // success
 }
 
-float adapf_run(void *data, float sample, float y)
+float adapf_run(void *data, float sample, float y, int update)
 {
     LMS_data *&& lms = static_cast<LMS_data *>(data);
     lms->push(sample);
     lms->err = y - lms->dot_product();
-    lms->update();
+    if (update)
+        lms->update();
     return lms->err;
 }
 
