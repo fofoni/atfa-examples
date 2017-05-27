@@ -7,18 +7,16 @@
  * Orientador: Markus Lima
  */
 
-extern "C" {
-
 constexpr unsigned N = 64;
 constexpr float mu = 0.5;
 
-struct LMS_data {
+struct AdapfData {
     float w[N];
     float x[N];
     float err;
     float *x_ptr;
     float * const x_end;
-    LMS_data() :
+    AdapfData() :
         err(0), x_ptr(x), x_end(x+N)
     {
         for (float& sample : x)
@@ -60,43 +58,40 @@ struct LMS_data {
     }
 };
 
-void *adapf_init(void)
+extern "C" {
+AdapfData *adapf_init(void)
 {
-    LMS_data *data = new LMS_data();
-    if (!data) return nullptr;
-    return data;
+    return new AdapfData();
 }
 
-void *adapf_restart(void *data)
+AdapfData *adapf_restart(AdapfData *data)
 {
     if (!data)
         return adapf_init();
-    static_cast<LMS_data *>(data)->reset();
+    data->reset();
     return data;
 }
 
-int adapf_close(void *data)
+int adapf_close(AdapfData *data)
 {
     if (!data)
         return 0;
-    delete static_cast<LMS_data *>(data);
+    delete data;
     return 1; // success
 }
 
-float adapf_run(void *data, float sample, float y, int update)
+float adapf_run(AdapfData *data, float sample, float y, int update)
 {
-    LMS_data *&& lms = static_cast<LMS_data *>(data);
-    lms->push(sample);
-    lms->err = y - lms->dot_product();
+    data->push(sample);
+    data->err = y - data->dot_product();
     if (update)
-        lms->update();
-    return lms->err;
+        data->update();
+    return data->err;
 }
 
-void adapf_getw(void *data, float **begin, unsigned *n)
+void adapf_getw(AdapfData *data, float **begin, unsigned *n)
 {
-    *begin = static_cast<LMS_data *>(data)->w;
+    *begin = data->w;
     *n = N;
 }
-
 }

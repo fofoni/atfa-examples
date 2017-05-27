@@ -1,4 +1,12 @@
 #!/bin/bash
+#
+# Universidade Federal do Rio de Janeiro
+# Escola Politécnica
+# Projeto Final de Graduação
+# Ambiente de Teste para Filtros Adaptativos
+# Pedro Angelo Medeiros Fonini <pedro.fonini@smt.ufrj.br>
+# Orientador: Markus Lima
+#
 
 directs=(*/)
 
@@ -14,6 +22,7 @@ fi
 for d in "${directs[@]}"; do
     title="${d%/}"
     title="${title^^}"
+    if [[ $title == "__PYCACHE__" ]]; then continue; fi
     printf "////////////////////////////////////////////////////\n"
     printf "/////\n"
     printf "/////    %s\n\n" "${title}"

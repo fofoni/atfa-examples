@@ -6,3 +6,5 @@
 # do not ignore CMakeLists.txt
 !CMakeLists.txt
 Makefile
+__pycache__
+TODO

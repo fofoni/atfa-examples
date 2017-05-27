@@ -7,21 +7,25 @@
  * Orientador: Markus Lima
  */
 
-#include <stdlib.h>
+// TODO: Põe mais comentários
+// TODO: readability >> performance; mudar o apêndice B
 
-#define N (64)
+#include <stdlib.h>
+#include <atfa_api.h>
+
+#define N (64) /* deve ser inteiro positivo */
 #define mu (0.5)
 
-typedef struct LMS_data {
+struct AdapfData {
     float w[N];
     float x[N];
     float err;
     float *x_ptr;
     float *x_end;
-} LMS_data;
+};
+typedef struct AdapfData AdapfData;
 
-void lms_reset(LMS_data *data)
-{
+static void lms_reset(AdapfData *data) {
     if (!data) return;
 
     data->err = 0;
@@ -32,17 +36,17 @@ void lms_reset(LMS_data *data)
         data->x[i] = data->w[i] = 0;
 }
 
-void lms_push(LMS_data *data, float sample) {
-    // unwind x_ptr
+static void lms_push(AdapfData *data, float sample) {
+    /* unwind x_ptr */
     if (data->x_ptr == data->x)
         data->x_ptr = data->x_end - 1;
     else
         --data->x_ptr;
-    // write new sample
+    /* write new sample */
     *data->x_ptr = sample;
 }
 
-float lms_dot_product(LMS_data *data) {
+static float lms_dot_product(AdapfData *data) {
     float result = 0;
     float *it_x, *it_w;
     for (it_x = data->x_ptr, it_w = data->w;
@@ -56,7 +60,7 @@ float lms_dot_product(LMS_data *data) {
     return result;
 }
 
-void lms_update(LMS_data *data) {
+static void lms_update(AdapfData *data) {
     float *it_x, *it_w;
     for (it_x = data->x_ptr, it_w = data->w;
          it_x != data->x_end;
@@ -68,45 +72,41 @@ void lms_update(LMS_data *data) {
         *it_w += 2 * mu * data->err * *it_x;
 }
 
-void *adapf_init(void)
+AdapfData *adapf_init(void)
 {
-    LMS_data *data = malloc(sizeof(LMS_data));
-    if (!data) return NULL;
-
+    AdapfData *data = malloc(sizeof(AdapfData));
     lms_reset(data);
-
     return data;
 }
 
-void *adapf_restart(void *data)
+AdapfData *adapf_restart(AdapfData *data)
 {
     if (!data)
         return adapf_init();
 
     lms_reset(data);
-
     return data;
 }
 
-int adapf_close(void *data)
+int adapf_close(AdapfData *data)
 {
     if (!data)
         return 0;
-    free((LMS_data *)data);
-    return 1; // success
+    free(data);
+    return 1; /* success */
 }
 
-float adapf_run(void *data, float sample, float y, int update)
+float adapf_run(AdapfData *data, float sample, float y, int update)
 {
     lms_push(data, sample);
-    ((LMS_data *)data)->err = y - lms_dot_product(data);
+    data->err = y - lms_dot_product(data);
     if (update)
         lms_update(data);
-    return ((LMS_data *)data)->err;
+    return data->err;
 }
 
-void adapf_getw(void *data, float **begin, unsigned *n)
+void adapf_getw(AdapfData *data, float **begin, unsigned *n)
 {
-    *begin = ((LMS_data *)data)->w;
+    *begin = data->w;
     *n = N;
 }

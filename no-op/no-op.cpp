@@ -7,37 +7,37 @@
  * Orientador: Markus Lima
  */
 
-extern "C" {
-
-struct dummy {
+struct AdapfData {
     float placeholder;
 };
 
-void *adapf_init(void)
+extern "C" {
+AdapfData *adapf_init(void)
 {
-    return new dummy();
+    return new AdapfData();
 }
 
-void *adapf_restart(void *data)
+AdapfData *adapf_restart(AdapfData *data)
 {
     return data;
 }
 
-int adapf_close(void *data)
+int adapf_close(AdapfData *data)
 {
-    delete static_cast<dummy *>(data);
+    if (!data)
+        return 0;
+    delete data;
     return 1; // success
 }
 
-float adapf_run(void *, float, float y, int)
+float adapf_run(AdapfData *, float, float y, int)
 {
     return y;
 }
 
-void adapf_getw(void *data, float **begin, unsigned *n)
+void adapf_getw(AdapfData *data, float **begin, unsigned *n)
 {
-    *begin = &static_cast<dummy *>(data)->placeholder;
+    *begin = &data->placeholder;
     *n = 0;
 }
-
 }
