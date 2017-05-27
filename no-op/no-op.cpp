@@ -7,11 +7,14 @@
  * Orientador: Markus Lima
  */
 
+#include <atfa_api.h>
+
+extern "C" {
+
 struct AdapfData {
     float placeholder;
 };
 
-extern "C" {
 AdapfData *adapf_init(void)
 {
     return new AdapfData();
@@ -40,4 +43,5 @@ void adapf_getw(AdapfData *data, float **begin, unsigned *n)
     *begin = &data->placeholder;
     *n = 0;
 }
+
 }

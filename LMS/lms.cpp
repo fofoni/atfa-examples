@@ -7,6 +7,8 @@
  * Orientador: Markus Lima
  */
 
+#include <atfa_api.h>
+
 constexpr unsigned N = 64;
 constexpr float mu = 0.5;
 
