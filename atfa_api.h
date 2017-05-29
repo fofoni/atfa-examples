@@ -7,8 +7,8 @@
  * Orientador: Markus Lima
  */
 
-#ifndef ATFA_API_HEADER_H
-#define ATFA_API_HEADER_H
+#ifndef ATFA_API_HEADER_H_
+#define ATFA_API_HEADER_H_
 
 #ifdef __cplusplus
 #    define EXTERN_C_BEGIN extern "C" {
@@ -56,4 +56,4 @@ typedef struct ATFA_API_table_t ATFA_API_table_t;
 
 EXTERN_C_END
 
-#endif
+#endif /* ATFA_API_HEADER_H_ */
