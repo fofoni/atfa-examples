@@ -42,9 +42,9 @@ struct AdapfData {
         // write new sample
         *x_ptr = sample;
     }
-    float dot_product() {
+    float dot_product() const {
         float result = 0;
-        float *it_x, *it_w;
+        const float *it_x, *it_w;
         for (it_x = x_ptr, it_w = w; it_x != x_end; ++it_x, ++it_w)
             result += *it_x * *it_w;
         for (it_x = x; it_x != x_ptr; ++it_x, ++it_w)

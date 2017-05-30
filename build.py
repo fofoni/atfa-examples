@@ -229,7 +229,7 @@ if __name__ == '__main__':
     )
 
     title_group.add_argument(
-        "+t",
+        "+t", "++title",
         help="Do not generate an 'adapf_title' function. You should provide it"
              " yourself.",
         action='store_false',
@@ -248,7 +248,7 @@ if __name__ == '__main__':
     )
 
     listing_group.add_argument(
-        "+l",
+        "+l", "++listing",
         help="Do not generate an 'adapf_listing' function. You should"
              " provide it yourself.",
         action='store_false',
@@ -285,9 +285,9 @@ if __name__ == '__main__':
     parser.add_argument(
         "++no-undefined",
         help="Do not pass the option ‘--no-undefined’ to the linker. The"
-             " ‘--no-undefined’ might give you some \"undefined symbol\""
-             " warnings. Most of the time, however, you should go with the"
-             " default.",
+             " ‘--no-undefined’ option might give you some \"undefined"
+             " symbol\" warnings. Most of the time, however, you should go"
+             " with the default.",
         action="store_true",
         dest="accept_undefined",
     )

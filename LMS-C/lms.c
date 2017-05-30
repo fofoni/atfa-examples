@@ -17,13 +17,11 @@
 struct AdapfData {
     float w[N]; /* vector of coefficients */
     float x[N]; /* vector of past input samples */
-    float err; /* error sample */
 };
 typedef struct AdapfData AdapfData;
 
 static void lms_reset(AdapfData *data) {
     if (!data) return;
-    data->err = 0;
     for (int i=0; i<N; ++i)
         data->x[i] = data->w[i] = 0;
 }
@@ -37,7 +35,7 @@ static void lms_push(AdapfData *data, float sample) {
     data->x[0] = sample;
 }
 
-static float lms_dot_product(AdapfData *data) {
+static float lms_dot_product(const AdapfData *data) {
     float result = 0;
     for (int i=0; i<N; ++i)
         result += data->x[i] * data->w[i];
@@ -45,9 +43,9 @@ static float lms_dot_product(AdapfData *data) {
 }
 
 /* LMS update equation */
-static void lms_update(AdapfData *data) {
+static void lms_update(AdapfData *data, float err) {
     for (int i=0; i<N; ++i)
-        data->w[i] += 2 * mu * data->err * data->x[i];
+        data->w[i] += 2 * mu * err * data->x[i];
 }
 
 AdapfData *adapf_init(void)
@@ -77,10 +75,10 @@ int adapf_close(AdapfData *data)
 float adapf_run(AdapfData *data, float sample, float y, int update)
 {
     lms_push(data, sample);
-    data->err = y - lms_dot_product(data);
+    float err = y - lms_dot_product(data);
     if (update)
-        lms_update(data);
-    return data->err;
+        lms_update(data, err);
+    return err;
 }
 
 /* provide a pointer to the vector of coefficients, for inspection */
