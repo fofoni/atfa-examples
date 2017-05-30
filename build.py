@@ -298,13 +298,13 @@ if __name__ == '__main__':
         "-v", "--verbose",
         help="Get more descriptive output.",
         action="count",
+        default=0,
     )
 
     ### Parse args
 
     args = parser.parse_args()
     vbs = args.verbose # verbosity (0 to 3)
-    if not vbs: vbs = 0
 
     # user must provide a non-empty title, or no title at all
     if args.title is not None:
