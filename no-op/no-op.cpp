@@ -38,7 +38,7 @@ float adapf_run(AdapfData *, float, float y, int)
     return y;
 }
 
-void adapf_getw(AdapfData *data, float **begin, unsigned *n)
+void adapf_getw(const AdapfData *data, const float **begin, unsigned *n)
 {
     *begin = &data->placeholder;
     *n = 0;

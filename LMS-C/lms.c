@@ -82,7 +82,7 @@ float adapf_run(AdapfData *data, float sample, float y, int update)
 }
 
 /* provide a pointer to the vector of coefficients, for inspection */
-void adapf_getw(AdapfData *data, float **begin, unsigned *n)
+void adapf_getw(const AdapfData *data, const float **begin, unsigned *n)
 {
     *begin = data->w;
     *n = N;

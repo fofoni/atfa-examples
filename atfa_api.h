@@ -28,7 +28,8 @@ typedef ADAPF_DATA *adapf_init_t(void);
 typedef ADAPF_DATA *adapf_restart_t(ADAPF_DATA *data);
 typedef int adapf_close_t(ADAPF_DATA *data);
 typedef float adapf_run_t(ADAPF_DATA *data, float sample, float y, int update);
-typedef void adapf_getw_t(ADAPF_DATA *data, float **begin, unsigned *n);
+typedef void adapf_getw_t(ADAPF_DATA const *data, float const **begin,
+                          unsigned *n);
 typedef const char *adapf_title_t(void);
 typedef const char *adapf_listing_t(void);
 

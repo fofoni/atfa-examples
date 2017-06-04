@@ -95,7 +95,7 @@ def gen_obj(f, obj, include_dir=None):
     else:
         die(13, "File ‘"+ f +"’ should be ‘.c’ or ‘.cpp’.")
     comp_full = compile_cmd(include_dir)[lang] + ["-o", obj, "-c", f]
-    # TODO: caso algum dos parêmetros (elementos da lista 'comp_full')
+    # TODO: caso algum dos parâmetros (elementos da lista 'comp_full')
     #       tenha caracteres estranhos, o check_call vai ficar de boa,
     #       mas o " ".join vai ficar confuso. Quotar os parâmetros
     #       que tiverem caracteres zoados (dica: shutils? shlex?)
