@@ -27,7 +27,8 @@ struct AdapfData;
 typedef ADAPF_DATA *adapf_init_t(void);
 typedef ADAPF_DATA *adapf_restart_t(ADAPF_DATA *data);
 typedef int adapf_close_t(ADAPF_DATA *data);
-typedef float adapf_run_t(ADAPF_DATA *data, float sample, float y, int update);
+typedef float adapf_run_t(ADAPF_DATA *data, float sample, float y, int update,
+                          int *updated);
 typedef void adapf_getw_t(ADAPF_DATA const *data, float const **begin,
                           unsigned *n);
 typedef const char *adapf_title_t(void);

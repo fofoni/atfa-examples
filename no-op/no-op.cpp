@@ -33,8 +33,9 @@ int adapf_close(AdapfData *data)
     return 1; // success
 }
 
-float adapf_run(AdapfData *, float, float y, int)
+float adapf_run(AdapfData *, float, float y, int, int *updated)
 {
+    *updated = 0;
     return y;
 }
 

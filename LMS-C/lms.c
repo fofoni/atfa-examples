@@ -72,12 +72,14 @@ int adapf_close(AdapfData *data)
 }
 
 /* given new input and reference samples, return the error sample */
-float adapf_run(AdapfData *data, float sample, float y, int update)
+float adapf_run(AdapfData *data, float sample, float y, int update,
+                int *updated)
 {
     lms_push(data, sample);
     float err = y - lms_dot_product(data);
     if (update)
         lms_update(data, err);
+    *updated = update;
     return err;
 }
 

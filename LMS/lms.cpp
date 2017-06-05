@@ -82,12 +82,14 @@ int adapf_close(AdapfData *data)
     return 1; // success
 }
 
-float adapf_run(AdapfData *data, float sample, float y, int update)
+float adapf_run(AdapfData *data, float sample, float y, int update,
+                int *updated)
 {
     data->push(sample);
     data->err = y - data->dot_product();
     if (update)
         data->update();
+    *updated = update;
     return data->err;
 }
 
