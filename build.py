@@ -54,6 +54,8 @@ dist_dir = os.path.dirname(os.path.realpath(__file__))
 # current directory
 curr_dir = os.path.realpath(os.getcwd())
 
+default_eigen_path = "/usr/include/eigen3"
+
 source_files = ["*.c", "*.cpp"]
 source_files_str = ", ".join(source_files)
 
@@ -71,16 +73,15 @@ cflags_wng    =         ["-Wall", "-Wextra", "-Werror", "-pedantic"]
 cflags_opt    =         ["-march=native", "-mtune=native", "-O3"]
 cflags        = {'C++': cflags_std['C++'] + cflags_wng + cflags_opt,
                  'C'  : cflags_std['C']   + cflags_wng + cflags_opt}
-compile_flags = lambda dir:(
-                        ["-fPIC", "-I{}".format(dir)] if dir else
-                        ["-fPIC"])
+compile_flags = lambda dirs: ["-fPIC"] + ["-I{}".format(d) for d in dirs]
 link_flags    =         ["-shared", "-rdynamic", "-Wl,--no-undefined"]
-compile_cmd   = lambda dir:(
-                {'C++': cc['C++'] + cflags['C++'] + compile_flags(dir),
-                 'C':   cc['C']   + cflags['C']   + compile_flags(dir)})
+compile_cmd   = lambda dirs:(
+                {'C++': cc['C++'] + cflags['C++'] + compile_flags(dirs),
+                 'C':   cc['C']   + cflags['C']   + compile_flags(dirs)})
 link_cmd      =         cc['C++'] + link_flags + cflags_wng + cflags_opt
 
-def gen_obj(f, obj, include_dir=None):
+def gen_obj(f, obj, include_dirs=[]):
+
     comp = "Compiling:"
     compmsg = tw.fill(comp + " " + f + " into " + os.path.split(obj)[-1])
     compmsg = compmsg.replace(comp, bcolors.green(comp), 1)
@@ -94,7 +95,7 @@ def gen_obj(f, obj, include_dir=None):
         lang = 'C++'
     else:
         die(13, "File ‘"+ f +"’ should be ‘.c’ or ‘.cpp’.")
-    comp_full = compile_cmd(include_dir)[lang] + ["-o", obj, "-c", f]
+    comp_full = compile_cmd(include_dirs)[lang] + ["-o", obj, "-c", f]
     # TODO: caso algum dos parâmetros (elementos da lista 'comp_full')
     #       tenha caracteres estranhos, o check_call vai ficar de boa,
     #       mas o " ".join vai ficar confuso. Quotar os parâmetros
@@ -572,7 +573,7 @@ if __name__ == '__main__':
                 atfa_api_header_filename, title_txt, lstng_txt, apitb_txt
             ).encode())
             f.flush()
-            gen_obj(autogen_name, sources[autogen_name], dist_dir)
+            gen_obj(autogen_name, sources[autogen_name], [dist_dir])
 
     else:
         autogen_name = None
@@ -582,7 +583,7 @@ if __name__ == '__main__':
     for k in sources:
         if k == autogen_name:
             continue
-        gen_obj(k, sources[k], dist_dir)
+        gen_obj(k, sources[k], [dist_dir, default_eigen_path])
 
     ### Link
 
