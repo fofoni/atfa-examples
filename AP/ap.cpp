@@ -19,23 +19,31 @@
 using sample_t = float;
 
 constexpr int N = 64;
-constexpr int M = 2;
+constexpr int M = 4; /* M must be <= N */
 constexpr sample_t mu = 0.9;
-constexpr sample_t delta = std::sqrt(std::numeric_limits<sample_t>::epsilon());
+/* delta is quite high in order to avoid numeric trouble, since the
+ * recursive computation of X^T*X is unstable (see AdapfData::push) */
+constexpr sample_t delta = (N/3+1) *
+std::sqrt(std::numeric_limits<sample_t>::epsilon());
 
 struct AdapfData {
 
     sample_t x_array[N*M];
+    sample_t xtx_array[M*M];
     sample_t w_array[N];
     sample_t e_array[M];
 
     Eigen::Map<Eigen::Matrix<sample_t, N, M>> X; // input matrix
     Eigen::Map<Eigen::Matrix<sample_t, N, 1>> x; // first column of X
+    Eigen::Map<Eigen::Matrix<sample_t, 1, M>> x_first; // first row of X
+    Eigen::Map<Eigen::Matrix<sample_t, 1, M>> x_last; // last row of X
+    Eigen::Map<Eigen::Matrix<sample_t, M, M>> XtX; // delta*I + X^T * X
     Eigen::Map<Eigen::Matrix<sample_t, N, 1>> w;
-    Eigen::Map<Eigen::Matrix<sample_t, 1, M>> err;
+    Eigen::Map<Eigen::Matrix<sample_t, M, 1>> err;
 
     AdapfData()
-        : X(x_array), x(x_array), w(w_array), err(e_array)
+    : X(x_array), x(x_array), x_first(x_array /* X is "symmetric" */),
+    x_last(x_array+(N-1)*M), XtX(xtx_array), w(w_array), err(e_array)
     {
         reset();
     }
@@ -44,15 +52,25 @@ struct AdapfData {
         std::fill(x_array, x_array+N*M, 0);
         std::fill(w_array, w_array+N, 0);
         std::fill(e_array, e_array+M, 0);
+        XtX = delta * Eigen::Matrix<sample_t, M, M>::Identity();
     }
 
     void push(sample_t sample) {
+
+        // first part of the update of the precomputed X^T * X matrix
+        Eigen::Matrix<sample_t, M, M> XtX_update_first =
+            -x_last.transpose()*x_last;
+
         // shift columns to the right
-        std::copy_backward(x_array, x_array+(M-1)*N, x_array+N*M);
+        std::copy_backward(x_array, x_array+N*(M-1), x_array+N*M);
         // shift first column downwards
-        std::copy_backward(x_array, x_array+(N-1), x_array+N)
+        std::copy_backward(x_array, x_array+(N-1), x_array+N);
         // push at top-left corner
         x_array[0] = sample;
+
+        // second part of the X^T * X update
+        XtX += XtX_update_first + x_first.transpose()*x_first;
+
     }
 
     void push_err(sample_t sample) {
@@ -64,8 +82,8 @@ struct AdapfData {
         return x.dot(w);
     }
 
-    void update(sample_t err) {
-        w += mu * err * x / (delta + x.squaredNorm());
+    void update() {
+        w += mu * X * XtX.llt().solve(err); // cholesky
     }
 
 };
@@ -97,11 +115,10 @@ float adapf_run(AdapfData *data, float sample, float y, int update,
 {
     data->push(sample);
     data->push_err(y - data->dot_product());
-    // TODO
     if (update)
-        data->update(err);
+        data->update();
     *updated = update;
-    return err;
+    return data->e_array[0];
 }
 
 void adapf_getw(const AdapfData *data, const float **begin, unsigned *n)
