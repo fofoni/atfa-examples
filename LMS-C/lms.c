@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <atfa_api.h>
 
-#define N (64) /* must be a positive integer */
+#define N (8000) /* must be a positive integer */
 #define mu (0.5)
 
 /* algorithm memory */

@@ -18,7 +18,7 @@
 
 using sample_t = float;
 
-constexpr int N = 64;
+constexpr int N = 8000;
 constexpr sample_t mu = 0.9;
 constexpr sample_t delta = std::sqrt(std::numeric_limits<sample_t>::epsilon());
 

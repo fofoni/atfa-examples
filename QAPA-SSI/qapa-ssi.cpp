@@ -25,6 +25,8 @@ constexpr sample_t mu = 0.9;
  * recursive computation of X^T*X is unstable (see AdapfData::push) */
 constexpr sample_t delta = 10 * N *
                            std::sqrt(std::numeric_limits<sample_t>::epsilon());
+constexpr sample_t beta = 5.0; // GMF-mod norm-0 fidelity
+constexpr sample_t alpha = 0.0025; // penalty gain
 
 struct AdapfData {
 
@@ -85,7 +87,9 @@ struct AdapfData {
     }
 
     void update() {
-        w += mu * X * XtX.llt().solve(err); // cholesky
+        w += mu * X * XtX.llt().solve(err) // cholesky
+           - alpha * (2 * beta*beta * w.array() /
+                      (beta*beta * w.array().square() + 1).square()).matrix(); // GMF-mod
     }
 
 };

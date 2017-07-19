@@ -25,6 +25,9 @@ constexpr sample_t mu = 0.9;
  * recursive computation of X^T*X is unstable (see AdapfData::push) */
 constexpr sample_t delta = 10 * N *
                            std::sqrt(std::numeric_limits<sample_t>::epsilon());
+constexpr sample_t beta = 5.0; // GMF-mod norm-0 fidelity
+constexpr sample_t alpha = 0.0025; // penalty gain
+constexpr sample_t gamma_bar = 1e-3; // sigma^2 = -100dB
 
 struct AdapfData {
 
@@ -75,9 +78,10 @@ struct AdapfData {
 
     }
 
-    void push_err(sample_t sample) {
-        std::copy_backward(e_array, e_array+(M-1), e_array+M);
-        e_array[0] = sample;
+    // returns whether the algorithm should update
+    bool push_err(sample_t sample) {
+        e_array[0] = sample - std::copysign(gamma_bar, sample);
+        return (sample > 0) == (e_array[0] > 0);
     }
 
     sample_t dot_product() const {
@@ -85,9 +89,10 @@ struct AdapfData {
     }
 
     void update() {
-        w += mu * X * XtX.llt().solve(err); // cholesky
+        w += mu * X * XtX.llt().solve(err) // cholesky
+        - alpha * (2 * beta*beta * w.array() /
+        (beta*beta * w.array().square() + 1).square()).matrix(); // GMF-mod
     }
-
 };
 
 extern "C" {
@@ -116,11 +121,15 @@ float adapf_run(AdapfData *data, float sample, float y, int update,
                 int *updated)
 {
     data->push(sample);
-    data->push_err(y - data->dot_product());
-    if (update)
+    sample_t err = y - data->dot_product();
+    bool should_update = data->push_err(err); (void)should_update;
+    if ((update==2) || (update && should_update)) {
         data->update();
-    *updated = update;
-    return data->e_array[0];
+        *updated = 1;
+    }
+    else
+        *updated = 0;
+    return err;
 }
 
 void adapf_getw(const AdapfData *data, const float **begin, unsigned *n)
