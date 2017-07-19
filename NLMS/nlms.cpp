@@ -12,8 +12,6 @@
 #include <algorithm>
 #include <limits>
 
-#include <Eigen/Eigen>
-
 #include <atfa_api.h>
 
 using sample_t = float;
@@ -24,34 +22,38 @@ constexpr sample_t delta = std::sqrt(std::numeric_limits<sample_t>::epsilon());
 
 struct AdapfData {
 
-    sample_t x_array[N];
-    Eigen::Map<Eigen::Matrix<sample_t, N, 1>> x;
-
-    sample_t w_array[N];
-    Eigen::Map<Eigen::Matrix<sample_t, N, 1>> w;
+    sample_t x[N];
+    sample_t w[N];
 
     AdapfData()
-        : x(x_array), w(w_array)
     {
         reset();
     }
 
     void reset() {
-        std::fill(x_array, x_array+N, 0);
-        std::fill(w_array, w_array+N, 0);
+        std::fill(x, x+N, 0);
+        std::fill(w, w+N, 0);
     }
 
     void push(sample_t sample) {
-        std::copy_backward(x_array, x_array+(N-1), x_array+N); // shift down
-        x_array[0] = sample; // push at top
+        std::copy_backward(x, x+(N-1), x+N); // shift down
+        x[0] = sample; // push at top
     }
 
     sample_t dot_product() const {
-        return x.dot(w);
+        sample_t result = 0;
+        for (int i=0; i<N; ++i)
+            result += x[i]*w[i];
+        return result;
     }
 
     void update(sample_t err) {
-        w += mu * err * x / (delta + x.squaredNorm());
+        sample_t x_normsquared = delta;
+        for (int i=0; i<N; ++i)
+            x_normsquared += x[i]*x[i];
+        sample_t factor = mu*err/x_normsquared;
+        for (int i=0; i<N; ++i)
+            w[i] += factor * x[i];
     }
 
 };
@@ -91,7 +93,7 @@ float adapf_run(AdapfData *data, float sample, float y, int update,
 
 void adapf_getw(const AdapfData *data, const float **begin, unsigned *n)
 {
-    *begin = data->w_array;
+    *begin = data->w;
     *n = N;
 }
 }
