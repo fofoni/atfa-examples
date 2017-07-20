@@ -12,78 +12,85 @@
 #include <algorithm>
 #include <limits>
 
-#include <Eigen/Eigen>
-
 #include <atfa_api.h>
 
 using sample_t = float;
 
 constexpr int N = 64;
-constexpr int M = 4; /* M must be <= N */
 constexpr sample_t mu = 0.9;
-/* delta is quite high in order to avoid numeric trouble, since the
- * recursive computation of X^T*X is unstable (see AdapfData::push) */
-constexpr sample_t delta = (N/3+1) *
-std::sqrt(std::numeric_limits<sample_t>::epsilon());
+constexpr sample_t delta = std::sqrt(std::numeric_limits<sample_t>::epsilon());
 
 struct AdapfData {
 
-    sample_t x_array[N*M];
-    sample_t xtx_array[M*M];
-    sample_t w_array[N];
-    sample_t e_array[M];
-
-    Eigen::Map<Eigen::Matrix<sample_t, N, M>> X; // input matrix
-    Eigen::Map<Eigen::Matrix<sample_t, N, 1>> x; // first column of X
-    Eigen::Map<Eigen::Matrix<sample_t, 1, M>> x_first; // first row of X
-    Eigen::Map<Eigen::Matrix<sample_t, 1, M>> x_last; // last row of X
-    Eigen::Map<Eigen::Matrix<sample_t, M, M>> XtX; // delta*I + X^T * X
-    Eigen::Map<Eigen::Matrix<sample_t, N, 1>> w;
-    Eigen::Map<Eigen::Matrix<sample_t, M, 1>> err;
+    sample_t x[N+1];
+    sample_t w[N];
+    sample_t e[2];
 
     AdapfData()
-    : X(x_array), x(x_array), x_first(x_array /* X is "symmetric" */),
-    x_last(x_array+(N-1)*M), XtX(xtx_array), w(w_array), err(e_array)
     {
         reset();
     }
 
     void reset() {
-        std::fill(x_array, x_array+N*M, 0);
-        std::fill(w_array, w_array+N, 0);
-        std::fill(e_array, e_array+M, 0);
-        XtX = delta * Eigen::Matrix<sample_t, M, M>::Identity();
+        std::fill(x, x+N+1, 0);
+        std::fill(w, w+N,   0);
+        std::fill(e, e+2,   0);
     }
 
     void push(sample_t sample) {
-
-        // first part of the update of the precomputed X^T * X matrix
-        Eigen::Matrix<sample_t, M, M> XtX_update_first =
-            -x_last.transpose()*x_last;
-
-        // shift columns to the right
-        std::copy_backward(x_array, x_array+N*(M-1), x_array+N*M);
-        // shift first column downwards
-        std::copy_backward(x_array, x_array+(N-1), x_array+N);
+        // shift to the right
+        std::copy_backward(x, x+N, x+N+1);
         // push at top-left corner
-        x_array[0] = sample;
-
-        // second part of the X^T * X update
-        XtX += XtX_update_first + x_first.transpose()*x_first;
-
+        x[0] = sample;
     }
 
     void push_err(sample_t sample) {
-        std::copy_backward(e_array, e_array+(M-1), e_array+M);
-        e_array[0] = sample;
+        std::copy_backward(e, e+1, e+2);
+        e[0] = sample;
     }
 
     sample_t dot_product() const {
-        return x.dot(w);
+        sample_t result = 0;
+        for (int i=0; i<N; ++i)
+            result += x[i]*w[i];
+        return result;
     }
 
     void update() {
-        w += mu * X * XtX.llt().solve(err); // cholesky
+
+        sample_t s00 = delta;
+        for (int i=0; i<N; ++i)
+            s00 += x[i]*x[i];
+
+        sample_t s01 = 0;
+        for (int i=0; i<N; ++i)
+            s01 += x[i]*x[i+1];
+
+        sample_t s11 = delta;
+        for (int i=0; i<N; ++i)
+            s11 += x[i+1]*x[i+1];
+
+        // X' * X + delta*I = [s00 s01
+        //                     s01 s11]
+
+        // cholesky
+        s00 = std::sqrt(s00);
+        s01 = s01 / s00;
+        s11 = std::sqrt(s11 - s01*s01);
+
+        // X' * X + delta*I = R' * R, R = [s00 s01
+        //                                 0   s11]
+
+        // double backsubsitution
+        sample_t a0 = e[0] / s00;
+        sample_t a1 = mu*(e[1] - s01*a0) / (s11*s11);
+                 a0 = (mu*a0 - s01*a1) / s00;
+
+        // mu * (X'*X)^(-1) * e = [a0 a1]'
+
+        for (int i=0; i<N; ++i)
+            w[i] += x[i]*a0 + x[i+1]*a1;
+
     }
 
 };
@@ -118,12 +125,12 @@ float adapf_run(AdapfData *data, float sample, float y, int update,
     if (update)
         data->update();
     *updated = update;
-    return data->e_array[0];
+    return data->e[0];
 }
 
 void adapf_getw(const AdapfData *data, const float **begin, unsigned *n)
 {
-    *begin = data->w_array;
+    *begin = data->w;
     *n = N;
 }
 }
