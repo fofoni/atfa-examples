@@ -73,7 +73,7 @@ struct AdapfData {
         // X' * X + delta*I = [s00 s01
         //                     s01 s11]
 
-        // cholesky
+        // 2x2 cholesky
         s00 = std::sqrt(s00);
         s01 = s01 / s00;
         s11 = std::sqrt(s11 - s01*s01);
