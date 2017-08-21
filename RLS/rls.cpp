@@ -39,7 +39,7 @@ void dot(const sample_t *A, const sample_t *B, sample_t *R) {
 struct AdapfData {
 
     sample_t x[N];
-    sample_t w[N];
+    sample_t w[N+N*N+1];
     sample_t S[N*N]; // big! N should be small
     sample_t err;
 
@@ -74,6 +74,9 @@ struct AdapfData {
 
         // TODO: otimização a ser feita: usar só metade da memória para S,
         //          já que é simétrica.
+
+        std::copy(S,    S+N*N,  w+N);
+        std::copy(&err, &err+1, w+N+N*N);
 
         // psi = S * x
         sample_t psi[N];
@@ -139,6 +142,7 @@ float adapf_run(AdapfData *data, float sample, float y, int update,
 void adapf_getw(const AdapfData *data, const float **begin, unsigned *n)
 {
     *begin = data->w;
-    *n = N;
+    *n = N+N*N+1;
+//     *n = N; //rs
 }
 }
