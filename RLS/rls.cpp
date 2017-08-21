@@ -16,7 +16,7 @@
 
 using sample_t = float;
 
-constexpr int N = 4;
+constexpr int N = 30;
 constexpr sample_t lambda = 0.9;
 constexpr sample_t delta = std::sqrt(std::numeric_limits<sample_t>::epsilon());
 
@@ -74,8 +74,6 @@ struct AdapfData {
 
         // TODO: otimização a ser feita: usar só metade da memória para S,
         //          já que é simétrica.
-        std::copy(S,    S+N*N,  w+N);
-        std::copy(&err, &err+1, w+N+N*N+N+1);
 
         // psi = S * x
         sample_t psi[N];

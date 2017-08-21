@@ -10,8 +10,14 @@
 #include <stdlib.h>
 #include <atfa_api.h>
 
-#define N (64) /* must be a positive integer */
-#define mu (0.5)
+/* `N', the filter length, must be a *positive* integer */
+#define N (512)
+/* `mu', the step size, should be slightly less than 1/trR;
+ * `trR' is N times the input power
+ * "input power", also called `sigma_x', is the mean of the squared input;
+ * Input power is normally less than 1e-2.
+ */
+#define mu (0.15)
 
 /* algorithm memory */
 struct AdapfData {

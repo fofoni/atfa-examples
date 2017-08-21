@@ -442,7 +442,8 @@ if __name__ == '__main__':
         warn("Looks like more than one of the source files define the"
              " ‘"+ main_src_string +"’ symbol table!")
     else:
-        logmsg(vbs,2, "Apparently ‘{}’ will be defined exactly once.")
+        logmsg(vbs,2, "Apparently ‘{}’ will be defined exactly once.".format(
+            main_src_string))
     if len(main_source) == 0:
         main_source = list(sources)
         logmsg(vbs,2, '"Main" source file: ‘{}’'.format(main_source[0]))

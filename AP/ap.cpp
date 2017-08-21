@@ -76,14 +76,14 @@ struct AdapfData {
         // 2x2 cholesky
         s00 = std::sqrt(s00);
         s01 = s01 / s00;
-        s11 = std::sqrt(s11 - s01*s01);
+        s11 = s11 - s01*s01; // s11 squared
 
         // X' * X + delta*I = R' * R, R = [s00 s01
-        //                                 0   s11]
+        //                                 0   sqrt(s11)]
 
         // double backsubsitution
         sample_t a0 = e[0] / s00;
-        sample_t a1 = mu*(e[1] - s01*a0) / (s11*s11);
+        sample_t a1 = mu*(e[1] - s01*a0) / s11;
                  a0 = (mu*a0 - s01*a1) / s00;
 
         // mu * (X'*X)^(-1) * e = [a0 a1]'
