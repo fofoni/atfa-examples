@@ -143,6 +143,6 @@ void adapf_getw(const AdapfData *data, const float **begin, unsigned *n)
 {
     *begin = data->w;
 //     *n = N+N*N+1;
-    *n = N;
+    *n = N;  // ????
 }
 }
